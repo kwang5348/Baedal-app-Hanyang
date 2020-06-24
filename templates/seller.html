@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css"
+          type="text/css">
+    <link rel="stylesheet" href="static/theme.css" type="text/css">
+    <script src="http://withphp.com/jquery-3.3.1.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js"
+            integrity="sha384-ZMP7rVo3mIykV+2+9J3UJ46jBk0WLaUAdn689aCwoqbBJiSnjAK/l8WvCWPIPm49"
+            crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/js/bootstrap.min.js"
+            integrity="sha384-ChfqqxuZUCnJSK3+MXmPNIyE6ZbWh2IMqE241rYiqJxyMiZ6OW/JmZQ5stwEULTy"
+            crossorigin="anonymous"></script>
+    <style>
+  .list-group-item-action:active {
+    color: #495057;
+    background-color: #f8f9fa;
+  }
+  .table th, .table td {
+    vertical-align: middle;
+  }
+
+
+    </style>
+    <script>
+    function change_passwd() {
+      let passwd = $("#passwd").val();
+      $.post('/seller/change-password', {'passwd':passwd}, function(res) {
+        let result = JSON.parse(res);
+        if(result['success']) {
+          alert('비밀번호 변경 완료');
+        }
+        else {
+          alert('비밀번호 변경 실패');
+        }
+      });
+    }
+
+    function change_name() {
+      let sname = $("#sname").val();
+      $.post('/seller/change-name', {'sname':sname}, function(res) {
+        let result = JSON.parse(res);
+        if(result['success']) {
+          alert('이름 변경 완료');
+        }
+        else {
+          alert('이름 변경 실패');
+        }
+      });
+    }
+
+    function add_menu(menu, store_id) {
+      $.post('/seller/add-menu', {'menu':menu, 'store_id':store_id}, function(res) {
+        let result = JSON.parse(res);
+        if(result['success']) {
+          alert('메뉴 추가 완료');
+          document.location.reload()
+        }
+        else {
+          alert('메뉴 추가 실패');
+        }
+      });
+    }
+
+    function delete_menu(mid) {
+      $.post('/seller/delete-menu', {'mid':mid}, function(res) {
+        let result = JSON.parse(res);
+        if(result['success']) {
+          alert('메뉴 삭제 완료');
+          document.location.reload()
+        }
+        else {
+          alert('메뉴 삭제 실패');
+        }
+      });
+    }
+
+    function change_menu_name(mid) {
+      let sname = $("#sname").val();
+      $.post('/seller/change-menu-name', {'menu': $("#menu" + mid).val(), 'mid': mid}, function(res) {
+        let result = JSON.parse(res);
+        if(result['success']) {
+          alert('이름 변경 완료');
+        }
+        else {
+          alert('이름 변경 실패');
+        }
+      });
+    }
+
+
+    function cancel_order(oid) {
+      let sname = $("#sname").val();
+      $.post('/seller/cancel-order', {'oid': oid}, function(res) {
+        let result = JSON.parse(res);
+        if(result['success']) {
+          alert('주문 취소 완료');
+          document.location.reload()
+        }
+        else {
+          alert('주문 취소 실패');
+        }
+      });
+    }
+
+    function confirm_order(oid) {
+        navigator.geolocation.getCurrentPosition(function(position){
+            var openWin = window.open("/seller/popup?lat=" + postion.coord.latitude + "&lng=" + position.coords.longitude + "&oid=" + oid);
+        });
+        var openWin = window.open("/seller/popup?lat=" + 1 + "&lng=" + 2 + "&oid=" + oid);
+    }
+
+    </script>
+</head>
+<body>
+<div class="py-5 text-center" style="background-image: url('static/cover-bubble-dark.svg');">
+    <div class="container">
+        <div class="row">
+            <div class="col-md-12">
+                <div class="list-group">
+                    <div class="list-group-item list-group-item-action flex-column align-items-start">
+                        <form class="mt-3 mb-1">
+                            <div class="form-group">
+                                <div class="input-group">
+                                    <input type="password" class="form-control" placeholder="비밀번호" id="passwd"
+                                           style="font-size:15px;" value="{{ seller.passwd }}">
+                                    <div class="input-group-append">
+                                        <button class="btn btn-primary btn-sm" type="button" onclick="change_passwd()">
+                                            변경
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <div class="input-group">
+                                    <input type="text" class="form-control" placeholder="이름" id="sname"
+                                           style="font-size:15px;" value="{{ seller.name }}">
+                                    <div class="input-group-append">
+                                        <button class="btn btn-primary btn-sm" type="button" onclick="change_name()">
+                                            변경
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-12 mt-1">
+                <div class="list-group">
+
+                    {% for store in stores %}
+                    <div href="#" class="list-group-item list-group-item-action flex-column align-items-start">
+                        <div class="d-flex w-100 justify-content-between">
+                            <h5 class="mb-1 mt-2" style="font-weight: 500;">{{ store.sname }}</h5>
+                        </div>
+                        <p class="mb-1 text-left" style="font-size: 15px;">
+                            주소 : {{ store.address }}({{ store.lat }},{{ store.lng }})<br>
+                            태그 : {{ store.tag }}
+                        </p>
+
+                        <div class="d-flex justify-content-between">
+                            <h6 class="mb-1 mt-2" style="font-weight: 500;">메뉴</h6>
+                        </div>
+                        <ul class="list-group">
+                            {% for menu in store.menus %}
+                            <li class="list-group-item d-flex justify-content-between align-items-center"
+                                style="padding:5px; font-size: 13px; padding-left: 10px;">
+                                <input type="text" id="menu{{ menu.mid }}" value="{{ menu.menu }}">
+                                <span>
+                    <a href="#" class="btn btn-primary btn-sm" style="font-size: 13px;"
+                       onclick="change_menu_name({{ menu.mid }})">변경</a>&nbsp;
+                    <a href="#" class="btn btn-primary btn-sm" style="font-size: 13px;"
+                       onclick="delete_menu({{ menu.mid }})">삭제</a>
+                  </span>
+                            </li>
+                            {% endfor %}
+                            <li class="list-group-item d-flex justify-content-between align-items-center"
+                                style="padding:5px; padding-left: 10px;">
+                                <a href="#" class="btn btn-primary btn-sm w-100" style="font-size: 13px;"
+                                   onclick="add_menu(prompt('추가할 메뉴 이름'), {{ store.sid }}); return false;">추가</a>
+                            </li>
+                        </ul>
+                        <div class="d-flex justify-content-between">
+                            <h6 class="mb-1 mt-2" style="font-weight: 500;">주문</h6>
+                        </div>
+
+                        <div class="table-responsive">
+                            <table class="table table-bordered" style="font-size: 13px;">
+                                <thead>
+                                <tr>
+                                    <th>메뉴</th>
+                                    <th>수량</th>
+                                    <th>구매자</th>
+                                    <th>확인</th>
+                                    <th>취소</th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                {% for order in orders %}
+                                <tr>
+                                    <td>{{ order.menu }}</td>
+                                    <td>{{ order.amount }}</td>
+                                    <td>{{ order.name }}</td>
+                                    <td><a href="#" class="btn btn-primary btn-sm" style="font-size: 13px;"
+                                           onclick="confirm_order({{ order.oid }})">확인</a></td>
+                                    <td><a href="#" class="btn btn-primary btn-sm" style="font-size: 13px;"
+                                           onclick="cancel_order({{ order.oid }})">취소</a></td>
+                                </tr>
+                                {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                    {% endfor %}
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+
+</html>

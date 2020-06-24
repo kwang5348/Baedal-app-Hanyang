@@ -1,0 +1,59 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+    <script src="http://withphp.com/jquery-3.3.1.min.js"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css" type="text/css">
+  <link rel="stylesheet" href="../static/theme.css" type="text/css">
+
+    <script>
+    function confirm_order(did) {
+      $.post('/seller/confirm-order', {'did':did, 'oid':findGetParameter("oid")}, function(res) {
+        let result = JSON.parse(res);
+        if(result['success']) {
+          alert('주문 확인 완료!');
+          window.close()
+        }
+        else {
+          alert('메뉴 추가 실패');
+        }
+      });
+    }
+    function findGetParameter(parameterName) {
+    var result = null,
+        tmp = [];
+    location.search
+        .substr(1)
+        .split("&")
+        .forEach(function (item) {
+          tmp = item.split("=");
+          if (tmp[0] === parameterName) result = decodeURIComponent(tmp[1]);
+        });
+    return result;
+}
+
+    </script>
+</head>
+<body>
+  <div class="py-5 text-center w-100 h-100" style="background-image: url('/static/cover-bubble-dark.svg');">
+    <div class="container">
+      <div class="row">
+          {% for d in deliver %}
+            <div class="col-md-4 p-0 py-2">
+              <div class="card border-0 rounded-0">
+                <div class="card-body p-4">
+                  <h3>{{ d.name }}({{ d.phone }})</h3>
+                  <a class="btn btn-outline-primary mt-3" onclick="confirm_order({{d.did}})">선택하기</a>
+                </div>
+              </div>
+            </div>
+          {% endfor %}
+      </div>
+    </div>
+  </div>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js" integrity="sha384-ZMP7rVo3mIykV+2+9J3UJ46jBk0WLaUAdn689aCwoqbBJiSnjAK/l8WvCWPIPm49" crossorigin="anonymous"></script>
+  <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/js/bootstrap.min.js" integrity="sha384-ChfqqxuZUCnJSK3+MXmPNIyE6ZbWh2IMqE241rYiqJxyMiZ6OW/JmZQ5stwEULTy" crossorigin="anonymous"></script>
+</body>
+</html>
